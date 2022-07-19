@@ -1,0 +1,114 @@
+{
+    "levels": [
+        {
+            "name": "first floor",
+            "value": "1"
+        },
+        {
+            "name": "ground",
+            "value": "0"
+        },
+        {
+            "name": "basement 01",
+            "value": "-1"
+        }
+    ],
+    "blocks": [
+        {
+            "name": "Clay",
+            "value": "Clasy"
+        },
+        {
+            "name": "Iron",
+            "value": "Iron"
+        },
+        {
+            "name": "Honey",
+            "value": "Honey"
+        },
+        {
+            "name": "Red sand",
+            "value": "Red_sand"
+        },
+        {
+            "name": "Brown mushroom",
+            "value": "Brown_mushroom"
+        },
+        {
+            "name": "Red mushroom",
+            "value": "Red_mushroom"
+        },
+        {
+            "name": "Purpur",
+            "value": "Purpur"
+        },
+        {
+            "name": "Crimson",
+            "value": "Crimson"
+        },
+        {
+            "name": "Amethyst",
+            "value": "Lapis"
+        },
+        {
+            "name": "Ice",
+            "value": "Ice"
+        },
+        {
+            "name": "Prismarine",
+            "value": "Prismarine"
+        },
+        {
+            "name": "Melon",
+            "value": "Melon"
+        },
+        {
+            "name": "Moss",
+            "value": "Moss"
+        },
+        {
+            "name": "Coal",
+            "value": "Coal"
+        },
+        {
+            "name": "Basalt",
+            "value": "Basalt"
+        }
+    ],
+    "coords": [
+        {
+            "name":"basement 01",
+            "acceptedValues": [
+                {
+                    "numbers": [1,2,3,4],
+                    "letters": ["a","b","c","d","e","f","g","h","i"],
+                    "note": "letters go left to right & numbers go top to bottom"
+                }
+            ],
+            "memberType":"All"
+        },
+        {
+            "name": "first floor",
+            "acceptedValues": [
+                {
+                    "numbers": [1,2,3],
+                    "letters": ["a","b","c","d","e"],
+                    "note": "letters go left to right & numbers go top to bottom"
+                }
+            ],
+            "memberType":"All"
+        },
+        {
+            "name":"ground",
+            "acceptedValues": [
+                {
+                    "numbers": [1,2,3],
+                    "letters": ["a","b","c","d","e","f"],
+                    "note": "No offical labels been put in place but saved as letters go left to right & numbers go top to bottom"
+                }
+            ],
+            "memberType":"StaffOnly"
+        }
+
+    ]
+}

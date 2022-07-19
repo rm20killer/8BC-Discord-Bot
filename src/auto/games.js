@@ -2,6 +2,9 @@
 const fs = require("fs");
 module.exports = {
   async execute() {
+    if (!fs.existsSync(`./data/tictactoe.json`)) {
+      await makegamefile();
+    }
     const gameChecks = async () => {
       const database = JSON.parse(
         fs.readFileSync(`./data/tictactoe.json`)
@@ -22,3 +25,18 @@ module.exports = {
     gameChecks();
   },
 };
+
+
+async function makegamefile()
+{
+  let data = {
+    total: 0,
+    finished: 0,
+    playing: 0,
+    ammountInArray: 0,
+    timeout: 0,
+    gameArray: [],
+  };
+  let dataJSON = JSON.stringify(data, null, 2);
+  await fs.writeFileSync(`./data/tictactoe.json`, dataJSON);
+}

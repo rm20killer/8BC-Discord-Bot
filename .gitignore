@@ -128,4 +128,5 @@ dist
 
 #user
 config.js
-.data/
+data/mailboxBackup.json
+data/tictactoe.json
