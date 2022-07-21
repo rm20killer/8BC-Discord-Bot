@@ -130,3 +130,5 @@ dist
 config.js
 data/mailboxBackup.json
 data/tictactoe.json
+utils/googlekey.json
+utils/ca-certificate.crt

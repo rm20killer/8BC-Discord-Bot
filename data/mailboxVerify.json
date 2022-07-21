@@ -1,114 +1,165 @@
 {
     "levels": [
         {
-            "name": "first floor",
-            "value": "1"
+            "name": "basement 01",
+            "value": "-1"
         },
         {
             "name": "ground",
             "value": "0"
         },
         {
-            "name": "basement 01",
-            "value": "-1"
+            "name": "first floor",
+            "value": "1"
         }
     ],
     "blocks": [
         {
             "name": "Clay",
-            "value": "Clasy"
+            "value": "Clay",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft/images/2/2d/ClayBlockNew.png"
         },
         {
             "name": "Iron",
-            "value": "Iron"
+            "value": "Iron",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft/images/d/dd/IronBlockNew.png"
         },
         {
             "name": "Honey",
-            "value": "Honey"
+            "value": "Honey",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft/images/f/f1/HoneyBlockV2.png"
         },
         {
             "name": "Red sand",
-            "value": "Red_sand"
+            "value": "Red_sand",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft/images/b/b8/RedSandNew.png"
         },
         {
             "name": "Brown mushroom",
-            "value": "Brown_mushroom"
+            "value": "Brown_mushroom",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft/images/8/82/BrownMushroomBlockNew.png"
         },
         {
             "name": "Red mushroom",
-            "value": "Red_mushroom"
+            "value": "Red_mushroom",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft/images/b/b1/RedMushroomBlockNew.png"
         },
         {
             "name": "Purpur",
-            "value": "Purpur"
+            "value": "Purpur",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d1/Purpur_Block_JE2_BE2.png"
         },
         {
             "name": "Crimson",
-            "value": "Crimson"
+            "value": "Crimson",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/60/Stripped_Crimson_Hyphae_(UD)_JE1.png"
+
         },
         {
             "name": "Amethyst",
-            "value": "Lapis"
+            "value": "Amethyst",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/b8/Block_of_Amethyst_JE1.png"
+
+        },
+        {
+            "name":"lapis",
+            "value":"lapis",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/55/Block_of_Lapis_Lazuli_JE3_BE3.png"
         },
         {
             "name": "Ice",
-            "value": "Ice"
+            "value": "Ice",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/03/Blue_Ice_JE3_BE2.png"
         },
         {
             "name": "Prismarine",
-            "value": "Prismarine"
+            "value": "Prismarine",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d9/Prismarine_JE2_BE2.gif"
         },
         {
             "name": "Melon",
-            "value": "Melon"
+            "value": "Melon",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/f0/Melon_JE2_BE2.png"
         },
         {
             "name": "Moss",
-            "value": "Moss"
+            "value": "Moss",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft_gamepedia/images/c/c0/Moss_Block_JE1_BE1.png"
         },
         {
             "name": "Coal",
-            "value": "Coal"
+            "value": "Coal",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft_gamepedia/images/c/cc/Block_of_Coal_JE3_BE2.png"
         },
         {
             "name": "Basalt",
-            "value": "Basalt"
+            "value": "Basalt",
+            "imageLink":"https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/f9/Basalt_%28UD%29_JE1_BE1.png"
         }
     ],
     "coords": [
         {
-            "name":"basement 01",
-            "acceptedValues": [
-                {
-                    "numbers": [1,2,3,4],
-                    "letters": ["a","b","c","d","e","f","g","h","i"],
-                    "note": "letters go left to right & numbers go top to bottom"
-                }
-            ],
-            "memberType":"All"
+            "name": "basement 01",
+            "acceptedValues": {
+                "numbers": [
+                    1,
+                    2,
+                    3,
+                    4
+                ],
+                "letters": [
+                    "a",
+                    "b",
+                    "c",
+                    "d",
+                    "e",
+                    "f",
+                    "g",
+                    "h",
+                    "i"
+                ],
+                "note": "letters go left to right & numbers go top to bottom"
+            },
+            "memberType": "All"
         },
         {
             "name": "first floor",
-            "acceptedValues": [
-                {
-                    "numbers": [1,2,3],
-                    "letters": ["a","b","c","d","e"],
-                    "note": "letters go left to right & numbers go top to bottom"
-                }
-            ],
-            "memberType":"All"
+            "acceptedValues": {
+                "numbers": [
+                    1,
+                    2,
+                    3
+                ],
+                "letters": [
+                    "a",
+                    "b",
+                    "c",
+                    "d",
+                    "e"
+                ],
+                "note": "letters go left to right & numbers go top to bottom"
+            },
+            "memberType": "All"
         },
         {
-            "name":"ground",
-            "acceptedValues": [
-                {
-                    "numbers": [1,2,3],
-                    "letters": ["a","b","c","d","e","f"],
-                    "note": "No offical labels been put in place but saved as letters go left to right & numbers go top to bottom"
-                }
-            ],
-            "memberType":"StaffOnly"
+            "name": "ground",
+            "acceptedValues": {
+                "numbers": [
+                    1,
+                    2,
+                    3
+                ],
+                "letters": [
+                    "a",
+                    "b",
+                    "c",
+                    "d",
+                    "e",
+                    "f"
+                ],
+                "note": "No offical labels been put in place but saved as letters go left to right & numbers go top to bottom"
+            },
+            "memberType": "StaffOnly"
         }
-
     ]
 }
