@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes, Model } = require("sequelize");
+const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("../../data/sequelize");
 //schemas
 const mailboxSchema = require("../../utils/models/mailboxes-schema")(sequelize,DataTypes);

@@ -6,10 +6,13 @@ const axios = require('axios');
 
 const mailboxVerifyJson = require("../../data/mailboxVerify.json");
 //database stuff
-const { Sequelize, DataTypes, Model } = require("sequelize");
+const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("../../data/sequelize");
 const mailboxSchema = require("../../utils/models/mailboxes-schema")(sequelize, DataTypes);
 
+//spreadsheet stuff
+const { GoogleSpreadsheet } = require('google-spreadsheet');
+const creds = require("../../utils/googlekey.json");
 //error codes:
 const ErrorCodes = {
     1: "passed",
@@ -23,6 +26,8 @@ const ErrorCodes = {
     //saving data error codes
     3000: "Error saving data",
     3001: "You cannot change data for other users",
+    //6001: "Error with spreadsheet",
+    6001:"No user found with that name in the server application, make sure name is entered correctly or send in a updated forum",
 }
 module.exports = {
     data: new SlashCommandBuilder()
@@ -135,11 +140,11 @@ module.exports = {
         .addUserOption(option =>
             option.setName('discord')
                 .setDescription('Enter Discord name of owner of mailbox')
-                .setRequired(true))
+                .setRequired(false))
         .addStringOption(option =>
             option.setName('twitch')
                 .setDescription('Enter Twitch name of owner of mailbox')
-                .setRequired(true)),
+                .setRequired(false)),
 
     async execute(interaction, client) {
         //console.log(interaction)
@@ -326,6 +331,39 @@ async function CreateMailbox(interaction, client) {
     }
     else {
         //grab this data from spreadsheet
+        let data = await getSpreadsheetData(client, minecraftUsername.value)
+        if(data.errorcode == 1){
+            console.log("found data")
+            twitchName = data.twitchName;
+            //find user with discord name
+            //check if data.discordName has a # and 4 characters after it
+            if (data.discordName.includes("#")){
+                if(data.discordName.split(/#/)[1].length === 4){
+                    let discordUser = await client.users.cache.find(user => user.tag  == data.discordName);
+                    if(discordUser){
+                    console.log(discordUser)
+                    //discordId = discordUser.id;
+                    //console.log(discordId)
+                    }
+                    else{
+                        await interaction.reply({ content: "Could not find the user on discord. Make sure application fourm is up to date", ephemeral: true });
+                        return;
+                    }
+                }   
+                else{
+                    await interaction.reply({ content: "Discord name is not in the correct format on the application fourm", ephemeral: true });
+                    return;
+                }
+            }
+            else{
+                await interaction.reply({ content: "Discord name is not in the correct format on the application fourm", ephemeral: true });
+                return;
+            }
+        }
+        else{
+            await interaction.reply({ content: ErrorCodes[data.errorcode], ephemeral: true });
+            return;
+        }
     }
 
     let coords = letter.value.toUpperCase() + number.value;
@@ -412,4 +450,47 @@ async function saveData(minecraftUsername, location, discordId, twitchName, mcUU
         return 3000;
     }
     return 1;
+}
+
+async function getSpreadsheetData(client,mcName)
+{
+    const doc = new GoogleSpreadsheet(client.config.spreadsheet);
+    await doc.useServiceAccountAuth(creds);
+    await doc.loadInfo();
+    console.log(doc.title+" has been opened");
+    const info = await doc.getInfo();
+    const sheet = doc.sheetsByIndex[0];
+    
+    n=sheet.rowCount
+    n=n
+    i=n-1
+    const load = "D1:F"+n;
+    console.log(load)
+    console.log("sheet has opened")
+    await sheet.loadCells(load);
+
+    let errorcode= 1
+    let discordName
+    let twitchName 
+    //find mcName
+    while(i>0){
+        if(sheet.getCell(i,3).value==mcName){
+            discordName = sheet.getCell(i,4).value;
+            twitchName = sheet.getCell(i,5).value;
+            break;
+        }
+        i--
+    }
+
+    if(i==0){
+        errorcode = 6001
+    }
+
+    let returnObject = {
+        discordName: discordName,
+        twitchName: twitchName,
+        errorcode: errorcode
+    }
+    console.log(returnObject)
+    return returnObject;
 }
