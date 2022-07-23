@@ -6,7 +6,7 @@ const { Sequelize, DataTypes, Model } = require("sequelize");
 const sequelize = require("../../data/sequelize");
 const mailboxSchema = require("../../utils/models/mailboxes-schema")(sequelize, DataTypes);
 
-const PostOfficeCoords = "0,0,0";
+const PostOfficeCoords = "662, 110, 1724";
 const mailboxVerifyJson = require("../../data/mailboxVerify.json");
 
 const ErrorCodes = {
