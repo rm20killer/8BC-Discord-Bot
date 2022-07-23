@@ -3,7 +3,8 @@ const { Client, GatewayIntentBits ,Collection  } = require("discord.js");
 const fs = require("fs");
 const client = new Client({
   intents: [
-    GatewayIntentBits.Guilds
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers
   ],
   partials: [`CHANNEL`, `MESSAGE`, `REACTION`],
   autoReconnect: true,

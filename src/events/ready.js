@@ -2,9 +2,11 @@ const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("../../data/sequelize");
 //schemas
 const mailboxSchema = require("../../utils/models/mailboxes-schema")(sequelize,DataTypes);
-
+const discord = require("discord.js");
+const {ActivityType} = require('discord.js');
 //timers
 const games = require('../auto/games');
+const statusUpdater = require("../auto/statusUpdater");
 module.exports = {
 	name: 'ready',
 	execute(client) {
@@ -19,5 +21,6 @@ module.exports = {
 			console.log("schema synced");
 		}
 		games.execute();
+		//statusUpdater.execute(client);
 	},
 };

@@ -26,8 +26,9 @@ const ErrorCodes = {
     //saving data error codes
     3000: "Error saving data",
     3001: "You cannot change data for other users",
-    //6001: "Error with spreadsheet",
-    6001:"No user found with that name in the server application, make sure name is entered correctly or send in a updated forum",
+    //spreadsheet error codes
+    6000: "Error with spreadsheet",
+    6001: "No user found with that name in the server application, make sure name is entered correctly or send in a updated forum",
 }
 module.exports = {
     data: new SlashCommandBuilder()
@@ -41,92 +42,32 @@ module.exports = {
             option.setName('level')
                 .setDescription('Enter your level')
                 .addChoices(
-                    {
-                        "name": "first floor",
-                        "value": "2"
-                    },
-                    {
-                        "name": "ground",
-                        "value": "1"
-                    },
-                    {
-                        "name": "basement 01",
-                        "value": "0"
-                    }
+                    { "name": "first floor", "value": "2" },
+                    { "name": "ground", "value": "1" },
+                    { "name": "basement 01", "value": "0" }
                 )
                 .setRequired(true))
         .addStringOption(option =>
             option.setName('block')
                 .setDescription('Enter your block')
                 .addChoices(
-                    {
-                        "name": "Clay",
-                        "value": "Clay"
-                    },
-                    {
-                        "name": "Iron",
-                        "value": "Iron"
-                    },
-                    {
-                        "name": "Honey",
-                        "value": "Honey"
-                    },
-                    {
-                        "name": "Red sand",
-                        "value": "Red_sand"
-                    },
-                    {
-                        "name": "Brown mushroom",
-                        "value": "Brown_mushroom"
-                    },
-                    {
-                        "name": "Red mushroom",
-                        "value": "Red_mushroom"
-                    },
-                    {
-                        "name": "Purpur",
-                        "value": "Purpur"
-                    },
-                    {
-                        "name": "Crimson",
-                        "value": "Crimson"
-                    },
-                    {
-                        "name": "Amethyst",
-                        "value": "Amethyst"
-                    },
-                    {
-                        "name":"lapis",
-                        "value":"lapis"
-                    },
-                    {
-                        "name": "Ice",
-                        "value": "Ice"
-                    },
-                    {
-                        "name": "Prismarine",
-                        "value": "Prismarine"
-                    },
-                    {
-                        "name": "Melon",
-                        "value": "Melon"
-                    },
-                    {
-                        "name": "Moss",
-                        "value": "Moss"
-                    },
-                    {
-                        "name": "Coal",
-                        "value": "Coal"
-                    },
-                    {
-                        "name": "Basalt",
-                        "value": "Basalt"
-                    },
-                    {
-                        "name": "staffArea",
-                        "value": "staffArea"
-                    }
+                    { "name": "Clay", "value": "Clay" },
+                    { "name": "Iron", "value": "Iron" },
+                    { "name": "Honey", "value": "Honey" },
+                    { "name": "Red sand", "value": "Red_sand" },
+                    { "name": "Brown mushroom", "value": "Brown_mushroom" },
+                    { "name": "Red mushroom", "value": "Red_mushroom" },
+                    { "name": "Purpur", "value": "Purpur" },
+                    { "name": "Crimson", "value": "Crimson" },
+                    { "name": "Amethyst", "value": "Amethyst" },
+                    { "name": "lapis", "value": "lapis" },
+                    { "name": "Ice", "value": "Ice" },
+                    { "name": "Prismarine", "value": "Prismarine" },
+                    { "name": "Melon", "value": "Melon" },
+                    { "name": "Moss", "value": "Moss" },
+                    { "name": "Coal", "value": "Coal" },
+                    { "name": "Basalt", "value": "Basalt" },
+                    { "name": "staffArea", "value": "staffArea" }
                 )
                 .setRequired(true))
         .addStringOption(option =>
@@ -154,6 +95,7 @@ module.exports = {
         //verify data if not 1 reply with error code
         let errorcode = await VerifyInput(level, letter, number);
         if (errorcode == 1) {
+            interaction.deferReply({ ephemeral: true });
             //continue
             CreateMailbox(interaction, client);
         }
@@ -275,7 +217,7 @@ async function CreateMailbox(interaction, client) {
         mcUUID = UUID.uuid;
     }
     else {
-        interaction.reply({ content: ErrorCodes[UUID.errorcode], ephemeral: true });
+        interaction.editReply({ content: ErrorCodes[UUID.errorcode], ephemeral: true });
         return;
     }
 
@@ -331,37 +273,44 @@ async function CreateMailbox(interaction, client) {
     }
     else {
         //grab this data from spreadsheet
-        let data = await getSpreadsheetData(client, minecraftUsername.value)
-        if(data.errorcode == 1){
-            console.log("found data")
+        let data
+        try {
+            data = await getSpreadsheetData(client, minecraftUsername.value)
+        }
+        catch (err) {
+            console.log(err)
+            interaction.editReply({ content: ErrorCodes[6000], ephemeral: true });
+            return;
+        }
+        if (data.errorcode == 1) {
+            //console.log("found data")
             twitchName = data.twitchName;
+            let discordName = data.discordName;
             //find user with discord name
             //check if data.discordName has a # and 4 characters after it
-            if (data.discordName.includes("#")){
-                if(data.discordName.split(/#/)[1].length === 4){
-                    let discordUser = await client.users.cache.find(user => user.tag  == data.discordName);
-                    if(discordUser){
-                    console.log(discordUser)
-                    //discordId = discordUser.id;
-                    //console.log(discordId)
-                    }
-                    else{
-                        await interaction.reply({ content: "Could not find the user on discord. Make sure application fourm is up to date", ephemeral: true });
-                        return;
-                    }
-                }   
-                else{
-                    await interaction.reply({ content: "Discord name is not in the correct format on the application fourm", ephemeral: true });
+            if (discordName.includes("#")) {
+                let name = discordName.split(/#/)[0];
+                let discriminator = discordName.split(/#/)[1];
+                let tags = discriminator.split("");
+                let tag = tags[0] + tags[1] + tags[2] + tags[3];
+                let discordTag = name + "#" + tag;
+                console.log(interaction.guild.members.cache)
+                console.log(interaction.guild.members.cache.find(user => user.user.tag === discordName))
+                if (interaction.guild.members.cache.find(user => user.user.tag === discordName)===undefined){
+                    await interaction.editReply({ content: "Could not find the user on discord. Make sure application fourm is up to date. Name: " + data.discordName, ephemeral: true });
                     return;
                 }
+                else{
+                    discordid = interaction.guild.members.cache.find(user => user.user.tag === discordTag).id;
+                }
             }
-            else{
-                await interaction.reply({ content: "Discord name is not in the correct format on the application fourm", ephemeral: true });
+            else {
+                await interaction.editReply({ content: "Discord name is not in the correct format on the application fourm", ephemeral: true });
                 return;
             }
         }
-        else{
-            await interaction.reply({ content: ErrorCodes[data.errorcode], ephemeral: true });
+        else {
+            await interaction.editReply({ content: ErrorCodes[data.errorcode], ephemeral: true });
             return;
         }
     }
@@ -381,7 +330,7 @@ async function CreateMailbox(interaction, client) {
         fieildArry.push({ name: "Twitch", value: twitchName, inline: true })
     }
     //savedata() if return is 1
-    let savedData = await saveData(minecraftUsername, location, discordId, twitchName, mcUUID, interaction,client);
+    let savedData = await saveData(minecraftUsername, location, discordId, twitchName, mcUUID, interaction, client);
 
     if (savedData == 1) {
         const embed = new Discord.EmbedBuilder()
@@ -390,15 +339,15 @@ async function CreateMailbox(interaction, client) {
             .setDescription("A mailbox has been created for you!")
             .addFields(fieildArry)
             .setThumbnail(`https://mc-heads.net/avatar/${mcUUID}.png`)
-        await interaction.reply({ embeds: [embed], ephemeral: true });
+        await interaction.editReply({ embeds: [embed], ephemeral: true });
     }
     else {
-        interaction.reply({ content: ErrorCodes[savedData], ephemeral: true });
+        interaction.editReply({ content: ErrorCodes[savedData], ephemeral: true });
     }
 
 }
 
-async function saveData(minecraftUsername, location, discordId, twitchName, mcUUID, interaction,client) {
+async function saveData(minecraftUsername, location, discordId, twitchName, mcUUID, interaction, client) {
     //check if minecraftUsername is in database
     //if it is, update it
     //if it is not, create it
@@ -410,11 +359,11 @@ async function saveData(minecraftUsername, location, discordId, twitchName, mcUU
             //check if interaction.user has a staff role
             let isStaff = false;
             for (let i = 0; i < client.config.staffroles.length; i++) {
-                if(interaction.member.roles.cache.some(r => r.id === client.config.staffroles[i])){
+                if (interaction.member.roles.cache.some(r => r.id === client.config.staffroles[i])) {
                     isStaff = true;
                 }
             }
-            if(isStaff){
+            if (isStaff) {
                 user.update({
                     location: location,
                     DiscordID: discordId,
@@ -430,7 +379,7 @@ async function saveData(minecraftUsername, location, discordId, twitchName, mcUU
                     mcUUID: mcUUID
                 });
             }
-            else{
+            else {
                 return 3001;
             }
         }
@@ -452,37 +401,39 @@ async function saveData(minecraftUsername, location, discordId, twitchName, mcUU
     return 1;
 }
 
-async function getSpreadsheetData(client,mcName)
-{
+async function getSpreadsheetData(client, mcName) {
     const doc = new GoogleSpreadsheet(client.config.spreadsheet);
     await doc.useServiceAccountAuth(creds);
     await doc.loadInfo();
-    console.log(doc.title+" has been opened");
+    //console.log(doc.title+" has been opened");
     const info = await doc.getInfo();
     const sheet = doc.sheetsByIndex[0];
-    
-    n=sheet.rowCount
-    n=n
-    i=n-1
-    const load = "D1:F"+n;
-    console.log(load)
-    console.log("sheet has opened")
+
+    n = sheet.rowCount
+    n = n
+    i = n - 1
+    const load = "D1:F" + n;
+    //console.log(load)
+    //console.log("sheet has opened")
     await sheet.loadCells(load);
 
-    let errorcode= 1
+    let errorcode = 1
     let discordName
-    let twitchName 
+    let twitchName
     //find mcName
-    while(i>0){
-        if(sheet.getCell(i,3).value==mcName){
-            discordName = sheet.getCell(i,4).value;
-            twitchName = sheet.getCell(i,5).value;
-            break;
+    while (i > 0) {
+        let data = sheet.getCell(i, 3).value
+        if (data) {
+            if (data.toLowerCase() === mcName.toLowerCase()) {
+                discordName = sheet.getCell(i, 4).value;
+                twitchName = sheet.getCell(i, 5).value;
+                break;
+            }
         }
         i--
     }
 
-    if(i==0){
+    if (i == 0) {
         errorcode = 6001
     }
 
@@ -491,6 +442,6 @@ async function getSpreadsheetData(client,mcName)
         twitchName: twitchName,
         errorcode: errorcode
     }
-    console.log(returnObject)
+    //console.log(returnObject)
     return returnObject;
 }
