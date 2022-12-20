@@ -11,6 +11,7 @@ module.exports = {
             if (!command) return;
 
             try {
+                console.log(`executing command ${interaction.commandName} for ${interaction.member.user.username}`)
                 await command.execute(interaction, client);
             } catch (error) {
                 console.error(error);
