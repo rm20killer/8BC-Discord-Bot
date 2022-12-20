@@ -1,4 +1,5 @@
 const Discord = require("discord.js");
+const MailboxWizard = require('../modal/mailbox-wizardModal');
 
 module.exports = {
     name: 'interactionCreate',
@@ -40,6 +41,18 @@ module.exports = {
                     embeds: [embed],
                 });
             }
+        }
+
+        else if (interaction.isModalSubmit)
+        {
+            const id = interaction.customId;
+            if(id === "mailbox-wizard")
+            {
+                MailboxWizard.execute(interaction, client);
+            }
+        }
+        else{
+            console.log(interaction);
         }
 
     },

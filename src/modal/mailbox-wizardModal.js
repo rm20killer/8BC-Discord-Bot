@@ -1,8 +1,8 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
 const Discord = require("discord.js");
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder } = require("discord.js");
 const fs = require("fs");
 const axios = require('axios');
+
 
 const mailboxVerifyJson = require("../../data/mailboxVerify.json");
 //database stuff
@@ -17,6 +17,7 @@ const creds = require("../../utils/googlekey.json");
 const ErrorCodes = {
     1: "passed",
     //verify coordinates error codes
+    1001: "Error with Level or Block",
     1002: "Number is not acceptable",
     1003: "Letter is not acceptable",
     1004: "Both number and letter are not acceptable",
@@ -30,84 +31,61 @@ const ErrorCodes = {
     6000: "Error with spreadsheet",
     6001: "No user found with that name in the server application, make sure name is entered correctly or send in a updated forum",
 }
-module.exports = {
-    data: new SlashCommandBuilder()
-        .setName("create-mailbox")
-        .setDescription("saves mailbox location")
-        .addStringOption(option =>
-            option.setName('minecraft-username')
-                .setDescription('Enter your full minecraft username')
-                .setRequired(true))
-        .addStringOption(option =>
-            option.setName('level')
-                .setDescription('Enter your level')
-                .addChoices(
-                    { "name": "first floor", "value": "2" },
-                    { "name": "ground", "value": "1" },
-                    { "name": "basement 01", "value": "0" }
-                )
-                .setRequired(true))
-        .addStringOption(option =>
-            option.setName('block')
-                .setDescription('Enter your block')
-                .addChoices(
-                    { "name": "Clay", "value": "Clay" },
-                    { "name": "Iron", "value": "Iron" },
-                    { "name": "Honey", "value": "Honey" },
-                    { "name": "Red sand", "value": "Red_sand" },
-                    { "name": "Brown mushroom", "value": "Brown_mushroom" },
-                    { "name": "Red mushroom", "value": "Red_mushroom" },
-                    { "name": "Purpur", "value": "Purpur" },
-                    { "name": "Crimson", "value": "Crimson" },
-                    { "name": "Amethyst", "value": "Amethyst" },
-                    { "name": "lapis", "value": "lapis" },
-                    { "name": "Ice", "value": "Ice" },
-                    { "name": "Prismarine", "value": "Prismarine" },
-                    { "name": "Melon", "value": "Melon" },
-                    { "name": "Moss", "value": "Moss" },
-                    { "name": "Coal", "value": "Coal" },
-                    { "name": "Basalt", "value": "Basalt" },
-                    { "name": "staffArea", "value": "staffArea" }
-                )
-                .setRequired(true))
-        .addStringOption(option =>
-            option.setName('letter')
-                .setDescription('Enter your letter')
-                .setRequired(true))
-        .addIntegerOption(option =>
-            option.setName('number')
-                .setDescription('Enter your number')
-                .setRequired(true))
-        .addUserOption(option =>
-            option.setName('discord')
-                .setDescription('Enter Discord name of owner of mailbox')
-                .setRequired(false))
-        .addStringOption(option =>
-            option.setName('twitch')
-                .setDescription('Enter Twitch name of owner of mailbox')
-                .setRequired(false)),
 
+module.exports = {
     async execute(interaction, client) {
-        //console.log(interaction)
-        const level = interaction.options.data[1].value;
-        const letter = interaction.options.data[3].value.toLowerCase();
-        const number = interaction.options.data[4].value;
-        //verify data if not 1 reply with error code
+        await interaction.deferReply({ ephemeral: true });
+        console.log(interaction);
+        console.log(interaction.components[0].components[0].value)
+        let minecraftUsername = interaction.components[0].components[0];
+        let UUID = await getMinecraftUUID(minecraftUsername);
+        if (UUID.errorcode == 1) {
+            mcUUID = UUID.uuid;
+        }
+        else {
+            interaction.editReply({ content: ErrorCodes[UUID.errorcode], ephemeral: true });
+            return;
+        }
+        let level = interaction.components[1].components[0].value;
+        let block = interaction.components[2].components[0].value;
+        let number = interaction.components[3].components[0].value;
+        let letter = interaction.components[4].components[0].value.toLowerCase();
         let errorcode = await VerifyInput(level, letter, number);
         if (errorcode == 1) {
-            interaction.deferReply({ ephemeral: true });
-            //continue
-            CreateMailbox(interaction, client);
+            let blockErrorcode = await CheckBlock(block);
+            if (blockErrorcode == 1) {
+                //continue
+                CreateMailbox(interaction, client);
+            }
+            else {
+                //reply with error code
+                interaction.editReply({ content: ErrorCodes[blockErrorcode], ephemeral: true });
+                return;
+            }
         }
         else {
             //reply with error code
-            interaction.reply({ content: ErrorCodes[errorcode], ephemeral: true });
+            interaction.editReply({ content: ErrorCodes[errorcode], ephemeral: true });
             return;
         }
-        //await interaction.reply("Pong!");
-    },
-};
 
+
+    }
+}
+async function CheckBlock(block) {
+    //check if block is in the list of blocks
+    //if it is, return 1
+    //if it is not, return an error number
+    //Error numbers:
+    //1001
+
+    if (block == "Clay" || block == "Iron" || block == "Honey" || block == "Red sand" || block == "Brown mushroom" || block == "Red mushroom" || block == "Purpur" || block == "Crimson" || block == "Amethyst" || block == "lapis" || block == "Ice" || block == "Prismarine" || block == "Melon" || block == "Moss" || block == "Coal" || block == "Basalt" || block == "staffArea") {
+        return 1;
+    }
+    else {
+        return 1001;
+    }
+}
 // verify data is part of the mailboxVerify.json file
 // if it is, return 1
 // if it is not, return an error number
@@ -116,10 +94,24 @@ module.exports = {
 // 1003: letter is not acceptable
 // 1004: both number and letter are not acceptable
 async function VerifyInput(level, letter, number) {
+    if (level == "first floor" || level == "ground" || level == "basement 01") {
+        if (level == "first floor") {
+            levelValue = 2;
+        }
+        else if (level == "ground") {
+            levelValue = 1;
+        }
+        else if (level == "basement 01") {
+            levelValue = 0;
+        }
+    }
+    else {
+        return 1001;
+    }
     //console.log(level)
-    let LevelI = parseInt(level)
+    let LevelI = parseInt(levelValue)
     //console.log(LevelI)
-
+    console.log(LevelI, letter, number)
     //covert json
     //let mailboxVerify = JSON.parse(JSON.stringify(mailboxVerifyJson));
     //console.log(mailboxVerifyJson.coords[LevelI])
@@ -129,6 +121,8 @@ async function VerifyInput(level, letter, number) {
     //check if number is in range return true
     //console.log(number)
 
+    return errorcode;
+    //!
     let numberInRange = false
     if (number >= AcceptedableNumber[0] && number <= AcceptedableNumber[AcceptedableNumber.length - 1]) {
         numberInRange = true;
@@ -160,6 +154,8 @@ async function VerifyInput(level, letter, number) {
             //letter and number are not in range
         }
     }
+
+
     return errorcode;
 }
 
@@ -207,7 +203,7 @@ async function getMinecraftUUID(name) {
 
 async function CreateMailbox(interaction, client) {
     //get all options
-    const minecraftUsername = interaction.options.data[0];
+    let minecraftUsername = interaction.components[0].components[0];
 
     let UUID = await getMinecraftUUID(minecraftUsername);
     //console.log(UUID)
@@ -221,41 +217,33 @@ async function CreateMailbox(interaction, client) {
         return;
     }
 
-    const level = interaction.options.data[1];
-    const block = interaction.options.data[2];
-    const letter = interaction.options.data[3];
-    const number = interaction.options.data[4];
+    let levelValue = interaction.components[1].components[0].value;
+    if (levelValue == "first floor" || levelValue == "ground" || levelValue == "basement 01") {
+        if (levelValue == "first floor") {
+            level = 2;
+        }
+        else if (levelValue == "ground") {
+            level = 1;
+        }
+        else if (levelValue == "basement 01") {
+            level = 0;
+        }
+    }
+    let block = interaction.components[2].components[0];
+    let number = interaction.components[3].components[0];
+    let letter = interaction.components[4].components[0];
     //check if interaction.options.data[5].name is discord
     //if it is, get discord name
     //if it is not, get twitch name
     let discordName = "";
     let twitch = "";
-    if (interaction.options.data[5]) {
-        if (interaction.options.data[5].name == "discord") {
-            discordName = interaction.options.data[5];
-        }
-        else if (interaction.options.data[5].name == "twitch") {
-            twitch = interaction.options.data[5];
-        }
-    }
 
-    //check for [6] if it is discord or twitch
-    //if it is discord, get discord name
-    //if it is twitch, get twitch name
-    if (interaction.options.data[6]) {
-        if (interaction.options.data[6].name == "discord") {
-            discordName = interaction.options.data[6];
-        }
-        else if (interaction.options.data[6].name == "twitch") {
-            twitch = interaction.options.data[6];
-        }
-    }
     let discordUser
     if (discordName) {
         discordUser = discordName.user
     }
     let location = {
-        level: level.value,
+        level: level,
         block: block.value,
         letter: letter.value.toUpperCase(),
         number: number.value
@@ -265,64 +253,58 @@ async function CreateMailbox(interaction, client) {
     let twitchName
     let discordId
 
-
-    if (discordUser && twitch) {
-        discordId = discordUser.id;
-        twitchName = twitch.value;
-
+    //grab this data from spreadsheet
+    let data
+    try {
+        data = await getSpreadsheetData(client, minecraftUsername.value)
     }
-    else {
-        //grab this data from spreadsheet
-        let data
-        try {
-            data = await getSpreadsheetData(client, minecraftUsername.value)
-        }
-        catch (err) {
-            console.log(err)
-            interaction.editReply({ content: ErrorCodes[6000], ephemeral: true });
-            return;
-        }
-        if (data.errorcode == 1) {
-            //console.log("found data")
-            twitchName = data.twitchName;
-            let discordName = data.discordName;
-            //find user with discord name
-            //check if data.discordName has a # and 4 characters after it
-            if (discordName.includes("#")) {
-                let name = discordName.split(/#/)[0];
-                let discriminator = discordName.split(/#/)[1];
-                let tags = discriminator.split("");
-                let tag = tags[0] + tags[1] + tags[2] + tags[3];
-                let discordTag = name + "#" + tag;
-                //console.log(interaction.guild.members.cache)
-                //console.log(interaction.guild.members.cache.find(user => user.user.tag === discordName))
-                if (interaction.guild.members.cache.find(user => user.user.tag === discordName)===undefined){
-                    await interaction.editReply({ content: "Could not find the user on discord. Make sure application fourm is up to date. Name: " + data.discordName, ephemeral: true });
-                    return;
-                }
-                else{
-                    discordId = interaction.guild.members.cache.find(user => user.user.tag === discordTag).user.id;
-                }
+    catch (err) {
+        console.log(err)
+        interaction.editReply({ content: ErrorCodes[6000], ephemeral: true });
+        return;
+    }
+    if (data.errorcode == 1) {
+        //console.log("found data")
+        twitchName = data.twitchName;
+        let discordName = data.discordName;
+        //find user with discord name
+        //check if data.discordName has a # and 4 characters after it
+        if (discordName.includes("#")) {
+            let name = discordName.split(/#/)[0];
+            let discriminator = discordName.split(/#/)[1];
+            let tags = discriminator.split("");
+            let tag = tags[0] + tags[1] + tags[2] + tags[3];
+            let discordTag = name + "#" + tag;
+            console.log(interaction.guild.members.cache.find(user => user.user.tag === discordName))
+            if (interaction.guild.members.cache.find(user => user.user.tag === discordName) === undefined) {
+                await interaction.editReply({ content: "Could not find the user on discord. Make sure application fourm is up to date. Discord Name in tracker: " + data.discordName, ephemeral: true });
+                return;
             }
             else {
-                await interaction.editReply({ content: "Discord name is not in the correct format on the application fourm", ephemeral: true });
-                return;
+                discordId = interaction.guild.members.cache.find(user => user.user.tag === discordTag).user.id;
+                console.log(discordId)
             }
         }
         else {
-            await interaction.editReply({ content: ErrorCodes[data.errorcode], ephemeral: true });
+            await interaction.editReply({ content: "Discord name is not in the correct format on the application fourm. Should be in format (name)#tag example `TheHotdish#7676`", ephemeral: true });
             return;
         }
     }
+    else {
+        await interaction.editReply({ content: ErrorCodes[data.errorcode], ephemeral: true });
+        return;
+    }
+
 
     let coords = letter.value.toUpperCase() + number.value;
-    let levelName = mailboxVerifyJson.levels[level.value].name;
+    let levelName = mailboxVerifyJson.levels[level].name;
     let fieildArry = [
         { name: "Level", value: levelName, inline: true },
         { name: "Block", value: block.value, inline: true },
         { name: "Coordinates", value: coords, inline: true },
 
     ];
+
     if (discordId) {
         fieildArry.push({ name: "Discord", value: `<@${discordId}>`, inline: true })
     }
@@ -348,6 +330,8 @@ async function CreateMailbox(interaction, client) {
 }
 
 async function saveData(minecraftUsername, location, discordId, twitchName, mcUUID, interaction, client) {
+    console.log("saving data")
+    console.log(minecraftUsername, location, discordId, twitchName, mcUUID)
     //check if minecraftUsername is in database
     //if it is, update it
     //if it is not, create it
@@ -380,7 +364,6 @@ async function saveData(minecraftUsername, location, discordId, twitchName, mcUU
                 });
             }
             else {
-                console.log(`User ${interaction.user.id} tried to update ${discordId}`)
                 return 3001;
             }
         }
