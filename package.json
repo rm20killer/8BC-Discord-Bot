@@ -13,6 +13,6 @@
     "discord.js": "^14.7.1",
     "google-spreadsheet": "^3.3.0",
     "pg": "^8.7.3",
-    "sequelize": "^6.21.3"
+    "sequelize": "^6.29.0"
   }
 }
