@@ -12,6 +12,7 @@
     "axios": "^0.27.2",
     "discord.js": "^14.7.1",
     "google-spreadsheet": "^3.3.0",
+    "minecraft-server-util": "^5.4.0",
     "pg": "^8.7.3",
     "sequelize": "^6.29.0"
   }
