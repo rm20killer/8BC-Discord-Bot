@@ -1,7 +1,7 @@
 
 const Discord = require("discord.js");
 const util = require('minecraft-server-util');
-
+const fs = require("fs")
 const ip = "mc.8bitcommunity.com"
 const ports = [
     25565, //waterfall
@@ -9,7 +9,12 @@ const ports = [
     25510, //survival
     25530 //plotworld
 ]
-
+const portsName = [{
+    25565 : "Proxy",
+    25500 :"Hub",
+    25510 : "survival",
+    25530 : "plotworld"
+}]
 const options = {
     timeout: 1000 * 5, // timeout in milliseconds
     enableSRV: true // SRV record lookup
@@ -41,11 +46,13 @@ module.exports = {
             let survivalPing
             let serverOnline = true
             let survivalOnline = true
+            
             try {
                 current_players = serverStatus.players.online
             } catch (error) {
                 current_players = 0
                 serverOnline = false
+                error = serverStatus
             }
             try {
                 ping = serverStatus.roundTripLatency
@@ -84,8 +91,8 @@ module.exports = {
 
             try {
                 let embed = new Discord.EmbedBuilder()
-                    .setTitle("Crash Report Server stats")
-                    .setDescription("Server stats")
+                    .setTitle("Crash Report Server Info")
+                    .setDescription("Server info")
                     .setColor("#0099ff")
                     .addFields(fieildArry)
                     .setTimestamp()
@@ -93,6 +100,7 @@ module.exports = {
                 thread.send({ embeds: [embed] })
             } catch (error) {
                 console.log(error);
+                SaveLog(survivalStatus,serverStatus)
                 thread.send("Error sending emebed, report this error to RM")
             }
 
@@ -106,14 +114,32 @@ async function getServerStatus(port) {
     let data
     await util.status(ip, port, options)
         .then((result) => {
-            //console.log(result);
+            console.log(result);
             data = result
         })
         .catch((error) => {
             console.error(error)
             data = error
+            thread.send(`Error getting server status for ${portsName[port]}: ${error}`)
         });
 
     return data
 
+}
+
+async function SaveLog(survivalStatus,serverStatus)
+{
+    //create a file
+    let date = new Date()
+    let fileName = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDay() + "-" + date.getHours() + "-" + date.getMinutes() + "-" + date.getSeconds() + ".txt"
+    data = {
+        survivalStatus,
+        serverStatus
+    }
+
+    //save to Logs
+    fs.writeFile(`Logs/${fileName}`, JSON.stringify(data), function (err) {
+        if (err) throw err;
+        console.log('Saved!');
+    });
 }
