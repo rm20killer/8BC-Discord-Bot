@@ -334,12 +334,21 @@ async function CreateMailbox(interaction, client) {
 
     if (savedData == 1) {
         const embed = new Discord.EmbedBuilder()
-            .setTitle("Mailbox Created for " + minecraftUsername.value)
+            .setTitle("Mailbox Record Created for " + minecraftUsername.value)
             .setColor("#0099ff")
             .setDescription("A mailbox has been created for you!")
             .addFields(fieildArry)
             .setThumbnail(`https://mc-heads.net/avatar/${mcUUID}.png`)
         await interaction.editReply({ embeds: [embed], ephemeral: true });
+
+        //get user for discordId
+        //if user exists, send them a message
+        if (discordId) {
+            let user = await client.users.fetch(discordId);
+            if (user) {
+                await user.send({ embeds: [embed]});
+            }
+        }
     }
     else {
         interaction.editReply({ content: ErrorCodes[savedData], ephemeral: true });
@@ -370,6 +379,8 @@ async function saveData(minecraftUsername, location, discordId, twitchName, mcUU
                     twitchName: twitchName.toLowerCase(),
                     mcUUID: mcUUID
                 });
+                //send message to discordId
+                
             }
             else if (interaction.user.id == discordId) {
                 user.update({

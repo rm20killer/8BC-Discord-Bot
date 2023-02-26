@@ -318,10 +318,14 @@ async function CreateMailbox(interaction, client) {
         const embed = new Discord.EmbedBuilder()
             .setTitle("Mailbox Created for " + minecraftUsername.value)
             .setColor("#0099ff")
-            .setDescription("A mailbox has been created for you!")
+            .setDescription("A mailbox record has been created for you!")
             .addFields(fieildArry)
             .setThumbnail(`https://mc-heads.net/avatar/${mcUUID}.png`)
         await interaction.editReply({ embeds: [embed], ephemeral: true });
+        let user = await client.users.fetch(DiscordID);
+        if (user) {
+            await user.send({ embeds: [embed]});
+        }
     }
     else {
         interaction.editReply({ content: ErrorCodes[savedData], ephemeral: true });

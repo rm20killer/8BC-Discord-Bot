@@ -125,10 +125,22 @@ async function deleteMail(interaction,olddata)
     }
     if(error === 1) {
         const embed = new Discord.EmbedBuilder()
-            .setTitle("Mailbox Deleted")
-            .setDescription(`${olddata.MinecraftUsername}mailbox has been deleted by <@${interaction.user.id}>`)
+            .setTitle("Mailbox Record Deleted")
+            .setDescription(`${olddata.MinecraftUsername} mailbox record has been deleted by <@${interaction.user.id}>`)
             .setColor("#0099ff")
             .setTimestamp()
         interaction.reply({ embeds: [embed]});
+
+        //send message to olddata.discordId#
+        const embed2 = new Discord.EmbedBuilder()
+            .setTitle("Mailbox Record Deleted")
+            .setDescription(`Your mailbox record has been deleted.\nIf this was a mistake feel free to make a new mailbox`)
+            .setColor("#0099ff")
+            .setTimestamp()
+
+        let user = await client.users.fetch(olddata.DiscordID);
+        if (user) {
+            await user.send({ embeds: [embed2]});
+        }
     }
 }
