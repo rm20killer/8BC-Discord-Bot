@@ -6,7 +6,7 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers
   ],
-  partials: [`CHANNEL`, `MESSAGE`, `REACTION`],
+  partials: [`CHANNEL`, `MESSAGE`, `REACTION`, `USER`, `GUILDMEMBER`],
   autoReconnect: true,
 });
 
