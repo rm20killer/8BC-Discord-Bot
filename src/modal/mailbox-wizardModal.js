@@ -277,7 +277,7 @@ async function CreateMailbox(interaction, client) {
             let discordTag = name + "#" + tag;
             //
             //console.log(interaction.guild.members.cache.find(user => user.user.tag === discordTag))
-            const user = client.users.cache.find(user => user.tag === userTag);
+            const user = client.users.cache.find(user => user.tag === discordTag);
             if (user===undefined){
                 await interaction.editReply({ content: "Could not find the user on discord. Make sure application fourm is up to date. Discord Name in tracker: " + data.discordName, ephemeral: true });
                 return;
