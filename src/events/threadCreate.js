@@ -37,8 +37,8 @@ module.exports = {
             
             thread.send("Thanks for creating a crash report, a tech staff will check on this as soon as possible")
             //get server status
-            let serverStatus = await getServerStatus(25565)
-            let survivalStatus = await getServerStatus(25510)
+            let serverStatus = await getServerStatus(25565,thread )
+            let survivalStatus = await getServerStatus(25510,thread )
             //console.log(serverStatus);
             //console.log(survivalStatus);
             let current_players
@@ -110,7 +110,7 @@ module.exports = {
 };
 
 
-async function getServerStatus(port) {
+async function getServerStatus(port,thread) {
     let data
     await util.status(ip, port, options)
         .then((result) => {
