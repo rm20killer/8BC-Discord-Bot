@@ -73,9 +73,15 @@ async function search(interaction) {
     catch (err) {
         console.log(err);
         error = 4000;
+        user = {
+            "dataValues":Error
+        }
     }
     if (user === null) {
         error = 404;
+        user = {
+            "dataValues":Error
+        }
     }
 
     let returnObject = {
@@ -123,7 +129,7 @@ async function reply(interaction, data) {
     // if (imageLink) {
     //     embed.setImage(imageLink);
     // }
-    
+
     try {
         await interaction.reply({ embeds: [embed], ephemeral: true });
     } catch (error) {
