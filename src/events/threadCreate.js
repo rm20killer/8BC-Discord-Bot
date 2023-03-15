@@ -114,7 +114,7 @@ async function getServerStatus(port,thread) {
     let data
     await util.status(ip, port, options)
         .then((result) => {
-            console.log(result);
+            // console.log(result);
             data = result
         })
         .catch((error) => {
