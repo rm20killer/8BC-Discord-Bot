@@ -3,7 +3,7 @@ const { ActionRowBuilder, ButtonBuilder } = require("discord.js");
 const fs = require("fs");
 const axios = require('axios');
 
-
+const CalcCoord = require("../../src/func/CalcCoord");
 const mailboxVerifyJson = require("../../data/mailboxVerify.json");
 //database stuff
 const { Sequelize, DataTypes } = require("sequelize");
@@ -230,8 +230,8 @@ async function CreateMailbox(interaction, client) {
         }
     }
     let block = interaction.components[2].components[0];
-    let number = interaction.components[3].components[0];
-    let letter = interaction.components[4].components[0];
+    let letter = interaction.components[3].components[0];
+    let number = interaction.components[4].components[0];
     //check if interaction.options.data[5].name is discord
     //if it is, get discord name
     //if it is not, get twitch name
@@ -242,11 +242,13 @@ async function CreateMailbox(interaction, client) {
     if (discordName) {
         discordUser = discordName.user
     }
+    let coord = CalcCoord(number.value,letter.value.toLowerCase(),block.value,level)
     let location = {
         level: level,
         block: block.value,
         letter: letter.value.toUpperCase(),
-        number: number.value
+        number: number.value,
+        coordinates: coord
     }
     //console.log(discordUser)
 
@@ -304,13 +306,14 @@ async function CreateMailbox(interaction, client) {
     }
 
 
-    let coords = letter.value.toUpperCase() + number.value;
+    let NumberLocation = letter.value.toUpperCase() + number.value;
     let levelName = mailboxVerifyJson.levels[level].name;
+    let TextCoord = coord.x + " " + coord.y + " " + coord.z + " (X Y Z)"
     let fieildArry = [
         { name: "Level", value: levelName, inline: true },
         { name: "Block", value: block.value, inline: true },
-        { name: "Coordinates", value: coords, inline: true },
-
+        { name: "Location", value: NumberLocation, inline: true },
+        { name: "coordinates", value: TextCoord, inline: true}
     ];
 
     if (discordId) {
@@ -330,7 +333,7 @@ async function CreateMailbox(interaction, client) {
             .addFields(fieildArry)
             .setThumbnail(`https://mc-heads.net/avatar/${mcUUID}.png`)
         await interaction.editReply({ embeds: [embed], ephemeral: true });
-        let user = await client.users.fetch(DiscordID);
+        let user = await client.users.fetch(discordId);
         if (user) {
             await user.send({ embeds: [embed]});
         }

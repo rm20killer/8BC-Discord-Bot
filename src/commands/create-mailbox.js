@@ -4,6 +4,7 @@ const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const fs = require("fs");
 const axios = require('axios');
 
+const CalcCoord = require("../../src/func/CalcCoord");
 const mailboxVerifyJson = require("../../data/mailboxVerify.json");
 //database stuff
 const { Sequelize, DataTypes } = require("sequelize");
@@ -254,11 +255,13 @@ async function CreateMailbox(interaction, client) {
     if (discordName) {
         discordUser = discordName.user
     }
+    let coord = CalcCoord(number.value,letter.value.toLowerCase(),block.value,level.value)
     let location = {
         level: level.value,
         block: block.value,
         letter: letter.value.toUpperCase(),
-        number: number.value
+        number: number.value,
+        coordinates: coord
     }
     //console.log(discordUser)
 
@@ -323,14 +326,16 @@ async function CreateMailbox(interaction, client) {
         }
     }
 
-    let coords = letter.value.toUpperCase() + number.value;
+    let Location = letter.value.toUpperCase() + number.value;
     let levelName = mailboxVerifyJson.levels[level.value].name;
+    let TextCoord = coord.x + " " + coord.y + " " + coord.z + " (X Y Z)"
     let fieildArry = [
         { name: "Level", value: levelName, inline: true },
         { name: "Block", value: block.value, inline: true },
-        { name: "Coordinates", value: coords, inline: true },
-
+        { name: "Location", value: Location, inline: true },
+        { name: "coordinates", value: TextCoord, inline: true}
     ];
+
     if (discordId) {
         fieildArry.push({ name: "Discord", value: `<@${discordId}>`, inline: true })
     }

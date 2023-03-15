@@ -80,34 +80,6 @@ async function acceptStatus(interaction, game, embed, database) {
   game.turn = random;
   let dataJSON = JSON.stringify(database, null, 2);
   fs.writeFileSync(`./data/tictactoe.json`, dataJSON);
-
-  // const top = [];
-  // const middle = [];
-  // const bottom = [];
-  // for (let i = 0; i < 3; i++) {
-  //   const button = new ButtonBuilder()
-  //     .setLabel("[ ]")
-  //     .setStyle(ButtonStyle.Primary)
-  //     .setCustomId("tic-play-" + key + "-0-" + i);
-  //   top.push(button);
-  // }
-  // for (let i = 0; i < 3; i++) {
-  //   const button = new ButtonBuilder()
-  //     .setLabel("[ ]")
-  //     .setStyle(ButtonStyle.Primary)
-  //     .setCustomId("tic-play-" + key + "-1-" + i);
-  //   middle.push(button);
-  // }
-  // for (let i = 0; i < 3; i++) {
-  //   const button = new ButtonBuilder()
-  //     .setLabel("[ ]")
-  //     .setStyle(ButtonStyle.Primary)
-  //     .setCustomId("tic-play-" + key + "-2-" + i);
-  //   bottom.push(button);
-  // }
-  // let row1 = new MessageActionRow().addComponents(top);
-  // let row2 = new MessageActionRow().addComponents(middle);
-  // let row3 = new MessageActionRow().addComponents(bottom);
   let rows = [];
 
   embed.addFields({name:"Current turn", value:turn(game)});

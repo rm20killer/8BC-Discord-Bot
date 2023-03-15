@@ -32,12 +32,12 @@ module.exports = {
                 .setRequired(false)),
     async execute(interaction, client) {
         //console.log(interaction)
-        if(interaction.options.data[0] === undefined) {
-            await interaction.reply({text:"Please enter one of the following: minecraft username, twitch username, or discord user",ephemeral: true});
+        if (interaction.options.data[0] === undefined) {
+            await interaction.reply({ text: "Please enter one of the following: minecraft username, twitch username, or discord user", ephemeral: true });
             return;
         }
-        if(interaction.options.data[1]) {
-            await interaction.reply({text:"only enter one of the fields",ephemeral: true});
+        if (interaction.options.data[1]) {
+            await interaction.reply({ text: "only enter one of the fields", ephemeral: true });
             return;
         }
         let searchResult = await search(interaction);
@@ -58,14 +58,14 @@ async function search(interaction) {
     let error = 1;
     let user
     let searcher
-    if(name.name === 'minecraft-username') {
-        searcher = {MinecraftUsername: name.value.toLowerCase()};
+    if (name.name === 'minecraft-username') {
+        searcher = { MinecraftUsername: name.value.toLowerCase() };
     }
-    else if(name.name === 'twitch-name') {
-        searcher = {twitchName: name.value.toLowerCase()};
+    else if (name.name === 'twitch-name') {
+        searcher = { twitchName: name.value.toLowerCase() };
     }
-    else if(name.name === 'discord-user') {
-        searcher = {DiscordID: name.value};
+    else if (name.name === 'discord-user') {
+        searcher = { DiscordID: name.value };
     }
     try {
         user = await mailboxSchema.findOne({ where: searcher });
@@ -88,22 +88,24 @@ async function search(interaction) {
 async function reply(interaction, data) {
     //console.log(data)
     const location = data.location
-    const { block, level, letter, number } = location;
+    const { block, level, letter, number, coordinates } = location;
     //from mailboxVerifyJson.levels get the level name
     let levelName = mailboxVerifyJson.levels[level].name;
-    let coordinates = letter.toUpperCase() +number.toString();
+    let Location = letter.toUpperCase() + number.toString();
+    let TextCoord = coordinates.x + " " + coordinates.y + " " + coordinates.z + " (X Y Z)"
     let fieldsarray = [
         { name: "Level", value: levelName, inline: true },
-        { name: "Coords", value: coordinates, inline: true },
-        { name: "Block", value: block,inline: false},
+        { name: "Block", value: block, inline: true },
+        { name: "Location", value: Location, inline: true },
+        { name: "coordinates", value: TextCoord, inline: true }
     ];
     //console.log(fieldsarray)
     //find the discord user with discor id
     let discordUser = await interaction.user.client.users.fetch(data.DiscordID);
     //get block from blockVerifyJson
-    let imageLink =""
-    for(let i = 0; i < mailboxVerifyJson.blocks.length; i++) {
-        if(mailboxVerifyJson.blocks[i].name === block) {
+    let imageLink = ""
+    for (let i = 0; i < mailboxVerifyJson.blocks.length; i++) {
+        if (mailboxVerifyJson.blocks[i].name === block) {
             imageLink = mailboxVerifyJson.blocks[i].imageLink;
             break;
         }
@@ -116,10 +118,16 @@ async function reply(interaction, data) {
         .setColor("#0099ff")
         .setThumbnail(`https://mc-heads.net/avatar/${data.mcUUID}.png`)
         .setFooter({ text: `id:${data.id} | <@${data.DiscordID}> | ${data.twitchName}`, iconURL: discordUser.avatarURL() });
-        //.setFooter({ text: `id:${data.id} | <@${data.DiscordID}> | ${data.twitchName}`});
+    //.setFooter({ text: `id:${data.id} | <@${data.DiscordID}> | ${data.twitchName}`});
 
-    if(imageLink) {
-        embed.setImage(imageLink);
+    // if (imageLink) {
+    //     embed.setImage(imageLink);
+    // }
+    
+    try {
+        await interaction.reply({ embeds: [embed], ephemeral: true });
+    } catch (error) {
+        console.error(error);
+        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
     }
-    await interaction.reply({ embeds: [embed], ephemeral: true });
 }
