@@ -279,7 +279,7 @@ async function CreateMailbox(interaction, client) {
             let discordTag = name + "#" + tag;
             console.log(name)
             const member = await interaction.guild.members.search({ query: name, cache: true  });
-            console.log(member)
+            // console.log(member)
             if (member.size===0){
                 await interaction.editReply({ content: "Could not find the user on discord. Make sure application fourm is up to date. Discord Name in tracker: " + data.discordName, ephemeral: true });
                 return;
@@ -287,12 +287,12 @@ async function CreateMailbox(interaction, client) {
             else if(member.size===1){
                 const getMember = member.first();
                 discordId = getMember.user.id;
-                console.log(discordId)
+                // console.log(discordId)
             }
             else{
                 const getMember = member.find(m => m.user.tag === discordTag);
                 discordId = getMember.user.id;
-                console.log(discordId)
+                // console.log(discordId)
             }
         }
         else {
@@ -337,6 +337,7 @@ async function CreateMailbox(interaction, client) {
         if (user) {
             await user.send({ embeds: [embed]});
         }
+        console.log("mailbox created for " + minecraftUsername + "at"+ location + "discordID: "+ discordId)
     }
     else {
         interaction.editReply({ content: ErrorCodes[savedData], ephemeral: true });
@@ -345,7 +346,7 @@ async function CreateMailbox(interaction, client) {
 }
 
 async function saveData(minecraftUsername, location, discordId, twitchName, mcUUID, interaction, client) {
-    console.log("saving data")
+    // console.log("saving data")
     console.log(minecraftUsername, location, discordId, twitchName, mcUUID)
     //check if minecraftUsername is in database
     //if it is, update it

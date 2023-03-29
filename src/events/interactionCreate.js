@@ -9,9 +9,16 @@ module.exports = {
         if (interaction.type === 2) {
             const command = client.slashcommand.get(interaction.commandName);
             if (!command) return;
-
             try {
-                console.log(`executing command ${interaction.commandName} for ${interaction.member.user.username}`)
+                var date = new Date();
+                var dateStr =
+                    ("00" + (date.getMonth() + 1)).slice(-2) + "/" +
+                    ("00" + date.getDate()).slice(-2) + "/" +
+                    date.getFullYear() + " " +
+                    ("00" + date.getHours()).slice(-2) + ":" +
+                    ("00" + date.getMinutes()).slice(-2) + ":" +
+                    ("00" + date.getSeconds()).slice(-2);
+                console.log(`executing command ${interaction.commandName} for ${interaction.member.user.username} at ${dateStr}`)
                 await command.execute(interaction, client);
             } catch (error) {
                 console.error(error);
@@ -44,15 +51,13 @@ module.exports = {
             }
         }
 
-        else if (interaction.isModalSubmit)
-        {
+        else if (interaction.isModalSubmit) {
             const id = interaction.customId;
-            if(id === "mailbox-wizard")
-            {
+            if (id === "mailbox-wizard") {
                 MailboxWizard.execute(interaction, client);
             }
         }
-        else{
+        else {
             console.log(interaction);
         }
 

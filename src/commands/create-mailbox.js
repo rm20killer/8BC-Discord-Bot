@@ -299,7 +299,7 @@ async function CreateMailbox(interaction, client) {
                 let discordTag = name + "#" + tag;
                 console.log(name)
                 const member = await interaction.guild.members.search({ query: name, cache: true });
-                console.log(member)
+                // console.log(member)
                 if (member.size===0){
                     await interaction.editReply({ content: "Could not find the user on discord. Make sure application fourm is up to date. Discord Name in tracker: " + data.discordName, ephemeral: true });
                     return;
@@ -307,12 +307,12 @@ async function CreateMailbox(interaction, client) {
                 else if(member.size===1){
                     const getMember = member.first();
                     discordId = getMember.user.id;
-                    console.log(discordId)
+                    // console.log(discordId)
                 }
                 else{
                     const getMember = member.find(m => m.user.tag === discordTag);
                     discordId = getMember.user.id;
-                    console.log(discordId)
+                    // console.log(discordId)
                 }
             }
             else {
@@ -353,7 +353,7 @@ async function CreateMailbox(interaction, client) {
             .addFields(fieildArry)
             .setThumbnail(`https://mc-heads.net/avatar/${mcUUID}.png`)
         await interaction.editReply({ embeds: [embed], ephemeral: true });
-
+        console.log("mailbox created for " + minecraftUsername.value + " at "+ TextCoord + " | Discord ID: "+ discordId)
         //get user for discordId
         //if user exists, send them a message
         if (discordId) {
