@@ -15,7 +15,7 @@ module.exports = {
         //if attachments more then 0
         if (attachments.length > 0) {
             attachments.forEach(attachment => {
-                console.log(attachment)
+                // console.log(attachment)
                 const nameArray = attachment[1].name.split("."); // Split the name
                 const attEx = nameArray[nameArray.length - 1].toLowerCase(); // Grab the last value of the array.
                 if (attEx == "log") {
@@ -27,7 +27,11 @@ module.exports = {
                             //if the first line = loading Minecraft
                             if (content.split("\n")[0].includes("Loading Minecraft")) {
 
-                                postToMClog(content, message)
+                                try {
+                                    postToMClog(content, message)
+                                } catch (error) {
+                                    console.log(error)
+                                }
                             }
                         })
                 }
@@ -74,7 +78,7 @@ function analyzeLog(message, json) {
         })
         .then(res => res.json())
         .then(json => {
-            console.log(json)
+            // console.log(json)
             if (json.success == false) {
 
             }
@@ -109,5 +113,8 @@ function analyzeLog(message, json) {
                 message.reply({ embeds: [embed] });
 
             }
+        })
+        .catch(err => {
+            console.log(err)
         })
 }
