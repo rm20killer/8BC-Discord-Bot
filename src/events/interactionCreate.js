@@ -25,9 +25,18 @@ module.exports = {
                 const embed = new Discord.EmbedBuilder()
                     .setDescription(`error executing command ${interaction.commandName}`)
                     .setColor("#2F3136");
-                return interaction.reply({
-                    embeds: [embed],
-                });
+                if(interaction.deferred == false && interaction.replied == false)
+                {
+                    return interaction.reply({
+                        embeds: [embed],
+                    });
+                }
+                else
+                {
+                    return interaction.editReply({
+                        embeds: [embed],
+                    });
+                }
             }
         }
         //buttons
