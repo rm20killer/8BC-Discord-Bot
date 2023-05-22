@@ -84,11 +84,11 @@ module.exports = async(client, thread) => {
             .addFields(fieildArry)
             .setTimestamp()
 
-        thread.send({ embeds: [embed] })
+        await thread.send({ embeds: [embed] })
     } catch (error) {
         console.log(error);
         SaveLog(survivalStatus,serverStatus)
-        thread.send("Error sending emebed, report this error to RM")
+        await thread.send("Error sending emebed, report this error to RM")
     }
 }
 

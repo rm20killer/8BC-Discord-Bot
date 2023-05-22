@@ -7,6 +7,7 @@ const {ActivityType} = require('discord.js');
 //timers
 const games = require('../auto/games');
 const statusUpdater = require("../auto/statusUpdater");
+// const DiscordID = require("../auto/discordID");
 module.exports = {
 	name: 'ready',
 	execute(client) {
@@ -21,6 +22,7 @@ module.exports = {
 			console.log("schema synced");
 		}
 		games.execute();
+		// DiscordID.execute(client);
 		//statusUpdater.execute(client);
 	},
 };

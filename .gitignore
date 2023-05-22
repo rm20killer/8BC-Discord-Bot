@@ -132,3 +132,5 @@ data/mailboxBackup.json
 data/tictactoe.json
 utils/googlekey.json
 utils/ca-certificate.crt
+data/DiscordID.json
+data/Spreadsheet.json
