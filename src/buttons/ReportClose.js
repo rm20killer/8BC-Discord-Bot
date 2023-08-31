@@ -33,9 +33,10 @@ module.exports = {
         });
       }
     } else {
-      await interaction.editReply({
+      await interaction.reply({
         content: "You do not have permission to close this thead",
         components: [],
+        ephemeral: true
       });
     }
   },

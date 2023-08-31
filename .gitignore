@@ -134,3 +134,4 @@ utils/googlekey.json
 utils/ca-certificate.crt
 data/DiscordID.json
 data/Spreadsheet.json
+test/SStoJson.js
