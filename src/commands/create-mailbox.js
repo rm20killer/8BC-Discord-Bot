@@ -171,7 +171,7 @@ async function VerifyInput(level, letter, number) {
 async function getMinecraftUUID(name) {
     nameArray = [name.value]
     //axios post request to mojang api with nameArray as body
-    const response = await axios.post('https://api.mojang.com/profiles/minecraft', nameArray);
+    const response = await axios.post('https://api.minecraftservices.com/minecraft/profile/lookup/bulk/byname', nameArray);
     //console.log(response)
 
     let uuid = ""
