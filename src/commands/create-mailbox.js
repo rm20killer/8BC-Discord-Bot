@@ -14,6 +14,9 @@ const mailboxSchema = require("../../utils/models/mailboxes-schema")(sequelize, 
 //spreadsheet stuff
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const creds = require("../../utils/googlekey.json");
+
+//discord id stuff
+const DiscordIDFilePath = require("../../data/DiscordID.json")
 //error codes:
 const ErrorCodes = {
     1: "passed",
@@ -292,32 +295,34 @@ async function CreateMailbox(interaction, client) {
             //find user with discord name
             //check if data.discordName has a # and 4 characters after it
             if (discordName.includes("#")) {
-                let name = discordName.split(/#/)[0];
-                let discriminator = discordName.split(/#/)[1];
-                let tags = discriminator.split("");
-                let tag = tags[0] + tags[1] + tags[2] + tags[3];
-                let discordTag = name + "#" + tag;
-                console.log(name)
-                const member = await interaction.guild.members.search({ query: name, cache: true });
-                // console.log(member)
-                if (member.size===0){
-                    await interaction.editReply({ content: "Could not find the user on discord. Make sure application fourm is up to date. Discord Name in tracker: " + data.discordName, ephemeral: true });
+                try {
+                    const matchingEntry = DiscordIDFilePath.Users.find(entry => entry.RawDiscordName.mcName.toLowerCase() === minecraftUsername.value.toLowerCase());
+
+                    if (!matchingEntry) {
+                        await interaction.editReply({ content: `Could not find a Discord ID associated with the mcName: ${minecraftUsername.value.toLowerCase()}`, ephemeral: true });
+                        return;
+                    }
+            
+                    // Extract discordName and proceed with existing logic
+                    // let discordId = matchingEntry.RawDiscordName.discordName; 
+                discordId = matchingEntry.discordID; 
+                }
+                catch (err) {
+                    console.log(err)
+                    await interaction.editReply({ content: `Could not find a Discord ID associated with the mcName: ${minecraftUsername}`, ephemeral: true });
                     return;
-                }
-                else if(member.size===1){
-                    const getMember = member.first();
-                    discordId = getMember.user.id;
-                    // console.log(discordId)
-                }
-                else{
-                    const getMember = member.find(m => m.user.tag === discordTag);
-                    discordId = getMember.user.id;
-                    // console.log(discordId)
                 }
             }
             else {
-                await interaction.editReply({ content: "Discord name is not in the correct format on the application fourm", ephemeral: true });
-                return;
+                //find discord id
+                let user = await client.users.fetch(discordName);
+                if (user) {
+                    discordId = user.id;
+                }
+                else {
+                    await interaction.editReply({ content: `Could not find a Discord ID associated with the mcName: ${minecraftUsername}`, ephemeral: true });
+                    return;
+                }
             }
         }
         else {
