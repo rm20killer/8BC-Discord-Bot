@@ -364,9 +364,10 @@ async function CreateMailbox(interaction, client) {
         if (discordId) {
             let user = await client.users.fetch(discordId);
             if (user) {
-                await user.send({ embeds: [embed]});
+                // await user.send({ embeds: [embed]});
             }
         }
+        updateRickSpreadsheet(client, minecraftUsername.value, location);
     }
     else {
         interaction.editReply({ content: ErrorCodes[savedData], ephemeral: true });
@@ -474,4 +475,87 @@ async function getSpreadsheetData(client, mcName) {
     }
     //console.log(returnObject)
     return returnObject;
+}
+
+
+async function updateRickSpreadsheet(client, mcName, location)
+{
+    console.log("updating mailbox spreadsheet")
+    //get level
+    let level = location.level;
+    //get level make first letter uppercase and remove 01
+    let floor = mailboxVerifyJson.levels[level].name;
+    if (floor.includes("01")) {
+        floor = floor.replace("01", "");
+    }
+    if(floor.includes("First floor")){
+        floor = "First"
+    }
+    floor = floor.charAt(0).toUpperCase() + floor.slice(1);
+
+    //get block
+    let block = location.block;
+    block = block.charAt(0).toUpperCase() + block.slice(1);
+    if(block=="Red_mushroom"||block=="Brown_mushroom"){
+        //get rid of mushroom
+        block = block.replace("mushroom", "")
+    }
+    //get letter
+    let letter = location.letter;
+    letter = letter.toUpperCase();
+    //get number
+    let number = location.number;
+    let Position = letter + number;
+
+    const doc = new GoogleSpreadsheet(client.config.RicksMailBox);
+    await doc.useServiceAccountAuth(creds);
+    await doc.loadInfo();
+    //console.log(doc.title+" has been opened");
+    const info = await doc.getInfo();
+    const sheet = doc.sheetsByIndex[0];
+    n = 350
+    const load = "A1:D" + n;
+    //console.log(load)
+    //console.log("sheet has opened")
+    await sheet.loadCells(load);
+
+    //find mcName
+    let i = 1
+    let found = false
+    while (i < n) {
+        let data = sheet.getCell(i, 0).value
+        if (data) {
+            if (data.toLowerCase() === mcName.toLowerCase()) {
+                found = true;
+                break;
+            }
+        }
+        i++
+    }
+    if (found) {
+        //update data
+        sheet.getCell(i, 1).value = floor;
+        sheet.getCell(i, 2).value = block;
+        sheet.getCell(i, 3).value = Position;
+    }
+    else {
+        //create new data
+        //find first empty row
+        let j = 1
+        while (j < n) {
+            let data = sheet.getCell(j, 0).value
+            if (!data) {
+                break;
+            }
+            j++
+        }
+        sheet.getCell(j, 0).value = mcName;
+        sheet.getCell(j, 1).value = floor;
+        sheet.getCell(j, 2).value = block;
+        sheet.getCell(j, 3).value = Position;
+    }
+
+    await sheet.saveUpdatedCells();
+    console.log("mailbox spreadsheet updated")
+    return;
 }

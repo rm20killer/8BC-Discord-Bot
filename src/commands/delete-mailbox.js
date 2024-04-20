@@ -8,6 +8,8 @@ const mailboxSchema = require("../../utils/models/mailboxes-schema")(sequelize, 
 
 const PostOfficeCoords = "0,0,0";
 const mailboxVerifyJson = require("../../data/mailboxVerify.json");
+const { GoogleSpreadsheet } = require('google-spreadsheet');
+const creds = require("../../utils/googlekey.json");
 
 const ErrorCodes = {
     1: "No error",
@@ -50,7 +52,7 @@ module.exports = {
                 }
             }
             if(isStaff || interaction.user.id == searchResult.user.DiscordID){
-                deleteMail(interaction,searchResult.user);
+                deleteMail(interaction,searchResult.user, client);
             }
             else{
                 interaction.reply({ content: "You can't delete that users mailbox", ephemeral: true });
@@ -86,7 +88,7 @@ async function search(interaction) {
         console.log(err);
         error = 4000;
     }
-    if (user === null) {
+    if (user == null) {
         error = 404;
     }
 
@@ -97,7 +99,7 @@ async function search(interaction) {
     return returnObject;
 }
 
-async function deleteMail(interaction,olddata)
+async function deleteMail(interaction,olddata, client)
 {
     const name = interaction.options.data[0];
 
@@ -142,5 +144,76 @@ async function deleteMail(interaction,olddata)
         if (user) {
             await user.send({ embeds: [embed2]});
         }
+        updateRickSpreadsheet(client, olddata.MinecraftUsername, olddata.location)
     }
+}
+
+
+async function updateRickSpreadsheet(client, mcName, location)
+{
+    console.log("updating mailbox spreadsheet")
+    //get level
+    let level = location.level;
+    //get level make first letter uppercase and remove 01
+    let floor = mailboxVerifyJson.levels[level].name;
+    if (floor.includes("01")) {
+        floor = floor.replace("01", "");
+    }
+    floor = floor.charAt(0).toUpperCase() + floor.slice(1);
+
+    //get block
+    let block = location.block;
+    block = block.charAt(0).toUpperCase() + block.slice(1);
+
+    //get letter
+    let letter = location.letter;
+    letter = letter.toUpperCase();
+    //get number
+    let number = location.number;
+    let Position = letter + number;
+
+    const doc = new GoogleSpreadsheet(client.config.RicksMailBox);
+    await doc.useServiceAccountAuth(creds);
+    await doc.loadInfo();
+    //console.log(doc.title+" has been opened");
+    const info = await doc.getInfo();
+    const sheet = doc.sheetsByIndex[0];
+    n = 350
+    const load = "A1:D" + n;
+    //console.log(load)
+    //console.log("sheet has opened")
+    await sheet.loadCells(load);
+
+    //find mcName
+    let i = 1
+    let found = false
+    while (i < n) {
+        let data = sheet.getCell(i, 0).value
+        if (data) {
+            if (data.toLowerCase() === mcName.toLowerCase()) {
+                found = true;
+                break;
+            }
+        }
+        i++
+    }
+    if (found) {
+        //remove user
+        // sheet.deleteRow(i);
+        sheet.getCell(i, 0).value = "";
+        sheet.getCell(i, 1).value = "";
+        sheet.getCell(i, 2).value = "";
+        sheet.getCell(i, 3).value = "";
+        
+        console.log("user found in mailbox spreadsheet and deleted")
+    }
+    else {
+//return if not found
+        console.log("user not found in mailbox spreadsheet")
+        return; 
+    }
+
+    await sheet.saveUpdatedCells();
+    console.log("mailbox spreadsheet updated")
+    return;
 }
