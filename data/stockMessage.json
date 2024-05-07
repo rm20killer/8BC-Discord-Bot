@@ -1,0 +1,15 @@
+{
+    "LowStock": {
+        "message": "Hi [NAME], this is an automated message from the Staff Team from the 8Bit Community Minecraft Server. During the recent spawn shop audit we noticed you have have a shop in [DISTRICT], but not been an active player for more than 3 months. Shops are intended for players who  actively play on the server to provide resources for other active players. We would love to see you back on the server and understand there are many reasons why you might have been away, but if you do not log in to the server to manage or remove your shop within the next week, by [DATE] your shop will be included in the next spawn shop cleanup in the coming weeks. Please message a server Mod if you have any questions."
+    },
+    "ShopNotLabeled": {
+        "message": "Hi [NAME], this is an automated message by the Staff Team from the 8-Bit Server. During our audit of spawn shops we found that your shop is missing a sign with your full IGN (In Game Name) breaking shop rule #2. You need to add a sign with your IGN to your shop  within a week by [DATE] or your shop will be included in the spawn clean-up list to be taken down. Thank you, and message a server Mod if you have any questions."
+    },
+    "OverStock": {
+        "message": "Hi [NAME], this is an automated message by the Staff Team from the 8-Bit Server. During our audit of spawn shops we noticed that your shop stocks over 21 items. Players may not stock their shops with more than 20 unique items (this includes different enchanting combinations and includes items being given away). You have a week (by [DATE])  to edit your shop stock so it complies with this community guideline. If your shop continues to to be over stocked after this date your shop will be included on the spawn clean up list to be taken down. Thank you, and message a server Mod if you have any questions. "
+    },
+    "NotBuilt":
+    {
+        "message": "Hi [NAME], this is an automated message by the Staff Team from the 8-Bit Server.  It has been more than 2 weeks since you started renovating your shop and it is still not yet open. You have 1 week (until [DATE]) to complete renovations and open shop or your shop will be included on the spawn clean up list to be taken down. Thank you, and message a server Mod if you have any questions."
+    }
+}

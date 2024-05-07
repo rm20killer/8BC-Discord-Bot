@@ -17,6 +17,11 @@ const creds = require("../../utils/googlekey.json");
 
 //discord id stuff
 const DiscordIDFilePath = require("../../data/DiscordID.json")
+
+//
+const storage = require("../../src/func/storage");
+const discord = require("../../src/func/discord");
+
 //error codes:
 const ErrorCodes = {
     1: "passed",
@@ -365,6 +370,7 @@ async function CreateMailbox(interaction, client) {
             let user = await client.users.fetch(discordId);
             if (user) {
                 // await user.send({ embeds: [embed]});
+                updateMetadata(discordId, location, mcUUID)
             }
         }
         updateRickSpreadsheet(client, minecraftUsername.value, location);
@@ -559,3 +565,29 @@ async function updateRickSpreadsheet(client, mcName, location)
     console.log("mailbox spreadsheet updated")
     return;
 }
+
+
+// async function updateMetadata(userID, location , mcUUID){
+//     const token = await storage.getDiscordTokens(userID);
+//     let metadata = {};
+//     try {
+//         let level = location.level;
+//         let floor = mailboxVerifyJson.levels[level].name;
+//         let letter = location.letter;
+//         letter = letter.toUpperCase();
+//         let number = location.number;
+//         let Position = letter + number;
+//         metadata = {
+//             floor: floor,
+//             block: location.block,
+//             position: Position,
+//             coordinates: location.coordinates,
+//             mcUUID: mcUUID
+//         };
+//     } catch (error) {
+//         e.message = `Error fetching external data: ${e.message}`;
+//         console.error(e);
+//     }
+
+//     await discord.pushMetadata(userID, token, metadata);
+// }
