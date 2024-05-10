@@ -81,7 +81,7 @@ module.exports = {
     if (interaction.options.data[3]) {
       if (interaction.options.data[3].name === "discorduser") {
         DiscordName = interaction.options.data[3].value;
-        DiscordUser = discordName.user;
+        DiscordUser = DiscordName.user;
       }
     } else {
       console.log("no discord user looking for discord id in google sheet");
