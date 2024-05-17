@@ -1,13 +1,11 @@
 const Discord = require("discord.js");
 
-
 module.exports = {
   name: "presenceUpdate",
   execute(client, oldMember, newMember) {
     return;
     //To enable this event, remove the return statement above
     //This event will announce in a specific channel when a user starts streaming minecraft on the 8bc server
-    
 
     // console.log("presenceUpdate");
     const channel = oldMember.guild.channels.find(
@@ -31,10 +29,14 @@ module.exports = {
           newMember.presence.game.name === "minecraft") ||
         newMember.presence.game.details.match(/!8bc !join/gi)
       ) {
-        channel.send(
-          `OH WOWIE! ${newMember.user}, s currently streaming on the 8-Bit Minecraft Server! Check it out: ${newMember.presence.game.url}`
-        );
-        return;
+        try {
+          channel.send(
+            `OH WOWIE! ${newMember.user}, currently streaming on the 8-Bit Minecraft Server! Check it out: ${newMember.presence.game.url}`
+          );
+          return;
+        } catch (error) {
+          console.log(error);
+        }
       }
     }
   },
