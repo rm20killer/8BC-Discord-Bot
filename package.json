@@ -12,7 +12,7 @@
     "axios": "^1.9.0",
     "cookie-parser": "^1.4.7",
     "crypto": "^1.0.1",
-    "discord.js": "^14.15.3",
+    "discord.js": "^14.22.1",
     "express": "^4.21.2",
     "google-spreadsheet": "^4.1.2",
     "minecraft-server-util": "^5.4.0",
